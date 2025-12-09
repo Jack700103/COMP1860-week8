@@ -1,0 +1,9 @@
+CHIP CounterDec {
+    IN dec, reset;
+    OUT out[4];
+    PARTS:
+        Not16(in=current, out=inverted);
+        Add16(a=inverted, b=1, out=decremented);
+        Mux16(a=current, b=decremented, sel=dec, out=next);
+        Register(in=next, load=!reset, out=current, out=out);
+}

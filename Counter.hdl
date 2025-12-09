@@ -1,0 +1,9 @@
+CHIP Counter {
+    IN inc, reset;
+    OUT out[4];
+    PARTS:
+        DFF(in=next[0..3], out=current[0..3], out=out[0..3]);
+        Add16(a=current, b=1, out=next_value);
+        Mux4Way16(a=current, b=next_value, sel=inc, out=next);
+        Mux4Way16(a=next, b=0, sel=reset, out=next_final);
+}

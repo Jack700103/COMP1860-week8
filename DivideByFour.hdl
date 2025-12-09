@@ -1,0 +1,10 @@
+CHIP DivideByFour {
+    IN Z;
+    OUT out[2];
+    PARTS:
+        DFF(in=next_state[0], out=state[0]);
+        DFF(in=next_state[1], out=state[1], out=out[0..1]);
+        And(a=state[0], b=~Z, out=w0);
+        And(a=~state[0], b=Z, out=w1);
+        Or(a=w0, b=w1, out=next_state[0]);
+}

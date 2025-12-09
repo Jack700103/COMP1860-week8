@@ -1,0 +1,8 @@
+CHIP MultiDisplayCounter {
+    IN dec, reset;
+    OUT DigitA[7], DigitB[7];
+    PARTS:
+        Split16(in=counter_value, high=high_byte, low=low_byte);
+        DisplayCounter(dec=dec, reset=reset, out=DigitA); 
+        DisplayCounter(dec=dec, reset=reset, out=DigitB); 
+}
