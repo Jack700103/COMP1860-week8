@@ -1,13 +1,12 @@
 CHIP Counter {
     IN inc, reset;
     OUT out[4];
-    
+
     PARTS:
-        DFF(in=next0, out=current0);
-        DFF(in=next1, out=current1);
-        DFF(in=next2, out=current2);
-        DFF(in=next3, out=current3, out=out);
-        Add16(a[0..3]=current[0..3], b=1, out=next_value[0..3]);
-        Mux16(a[0..3]=current[0..3], b[0..3]=next_value[0..3], sel=inc, out[0..3]=next[0..3]);
-        Mux16(a[0..3]=next[0..3], b=0, sel=reset, out[0..3]=next_final[0..3]);
+    Register(in=nextVal, load=load, out=currentVal);
+    SubBus(in=currentVal, out=out, start=0, end=3);
+    Inc16(in=currentVal, out=incrementedVal);
+    Or(a=inc, b=reset, out=load);
+
+    Mux16(a=incrementedVal, b[0..15]=false, sel=reset, out=nextVal);
 }

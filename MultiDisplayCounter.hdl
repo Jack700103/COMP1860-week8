@@ -1,8 +1,23 @@
 CHIP MultiDisplayCounter {
     IN dec, reset;
-    OUT DigitA[7], DigitB[7];
+    OUT DigitA[7], DigitB[7]; 
+
     PARTS:
-        Split16(in=counter_value, high=high_byte, low=low_byte);
-        DisplayCounter(dec=dec, reset=reset, out=DigitA); 
-        DisplayCounter(dec=dec, reset=reset, out=DigitB); 
+    Register(in=nextVal, load=load, out=currentVal);
+    Not16(in[0..15]=false, out=negOne);
+    Add16(a=currentVal, b=negOne, out=decrementedVal);
+    Not16(in[0..15]=false, out=twoFiftyFive);
+    Or(a=dec, b=reset, out=load);
+    Mux16(a=decrementedVal, b=twoFiftyFive, sel=reset, out=tempVal);
+    Mux16(a=currentVal, b=tempVal, sel=load, out=nextVal);
+    SubBus(in=currentVal, out=lowNibble, start=0, end=3);
+    SubBus(in=currentVal, out=highNibble, start=4, end=7);
+    Decoder(in[0]=lowNibble[0], in[1]=lowNibble[1], 
+            in[2]=lowNibble[2], in[3]=lowNibble[3],
+            a=DigitA[0], b=DigitA[1], c=DigitA[2], d=DigitA[3], 
+            e=DigitA[4], f=DigitA[5], g=DigitA[6]);
+    Decoder(in[0]=highNibble[0], in[1]=highNibble[1], 
+            in[2]=highNibble[2], in[3]=highNibble[3],
+            a=DigitB[0], b=DigitB[1], c=DigitB[2], d=DigitB[3], 
+            e=DigitB[4], f=DigitB[5], g=DigitB[6]);
 }

@@ -1,10 +1,15 @@
 CHIP CounterDec {
     IN dec, reset;
     OUT out[4];
-    
+
     PARTS:
-        Register(in=next[0..3], load=!reset, out=current[0..3]);
-        Not16(in=current, out=inverted);
-        Add16(a=inverted, b=1, out=decremented);
-        Mux16(a=current, b=decremented, sel=dec, out=next[0..3]);
+    Register(in=nextVal, load=load, out=currentVal);
+    SubBus(in=currentVal, out=out, start=0, end=3);
+    Not16(in[0..15]=false, out=negOne);
+    Add16(a=currentVal, b=negOne, out=decrementedVal);
+    And16(a[0]=true, a[3]=true, a[1..2]=false, a[4..15]=false,
+          b[0..15]=true, out=nine);
+    Or(a=dec, b=reset, out=load);
+    Mux16(a=decrementedVal, b=nine, sel=reset, out=tempVal);
+    Mux16(a=currentVal, b=tempVal, sel=load, out=nextVal);
 }
