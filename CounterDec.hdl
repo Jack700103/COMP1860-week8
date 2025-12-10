@@ -1,15 +1,39 @@
 CHIP CounterDec {
     IN dec, reset;
     OUT out[4];
-
+    
     PARTS:
-    Register(in=nextVal, load=load, out=currentVal);
-    SubBus(in=currentVal, out=out, start=0, end=3);
-    Not16(in[0..15]=false, out=negOne);
-    Add16(a=currentVal, b=negOne, out=decrementedVal);
-    And16(a[0]=true, a[3]=true, a[1..2]=false, a[4..15]=false,
-          b[0..15]=true, out=nine);
-    Or(a=dec, b=reset, out=load);
-    Mux16(a=decrementedVal, b=nine, sel=reset, out=tempVal);
-    Mux16(a=currentVal, b=tempVal, sel=load, out=nextVal);
+    DFF(in=next0, out=current0);
+    DFF(in=next1, out=current1);
+    DFF(in=next2, out=current2);
+    DFF(in=next3, out=current3);
+    
+    Or(a=current0, b=false, out=out[0]);
+    Or(a=current1, b=false, out=out[1]);
+    Or(a=current2, b=false, out=out[2]);
+    Or(a=current3, b=false, out=out[3]);
+    
+    Not(in=current0, out=dec0);                 
+    Or(a=current0, b=false, out=c0);            
+    
+    Not(in=c0, out=not_c0);
+    Xor(a=current1, b=not_c0, out=dec1);        
+    Or(a=current1, b=c0, out=c1);               
+    
+    Not(in=c1, out=not_c1);
+    Xor(a=current2, b=not_c1, out=dec2);        
+    Or(a=current2, b=c1, out=c2);               
+    
+    Not(in=c2, out=not_c2);
+    Xor(a=current3, b=not_c2, out=dec3);        
+    
+    Mux(a=current0, b=dec0, sel=dec, out=decOrCurrent0);
+    Mux(a=current1, b=dec1, sel=dec, out=decOrCurrent1);
+    Mux(a=current2, b=dec2, sel=dec, out=decOrCurrent2);
+    Mux(a=current3, b=dec3, sel=dec, out=decOrCurrent3);
+    
+    Mux(a=decOrCurrent0, b=true, sel=reset, out=next0);   
+    Mux(a=decOrCurrent1, b=false, sel=reset, out=next1);   
+    Mux(a=decOrCurrent2, b=false, sel=reset, out=next2);   
+    Mux(a=decOrCurrent3, b=true, sel=reset, out=next3);   
 }

@@ -1,30 +1,19 @@
 CHIP DivideByFour {
     IN Z;
-    OUT out[2]; 
-
+    OUT out[2];
+    
     PARTS:
-    DFF(in=D0, out=out[0]);
-    DFF(in=D1, out=out[1]);
-    Xor(a=out[0], b=out[1], out=xor1);
-    Xor(a=xor1, b=Z, out=D0);
-
-    Not(in=out[0], out=notQ0);
-    Not(in=out[1], out=notQ1);
-    Not(in=Z, out=notZ);
-
-    And(a=out[1], b=notQ0, out=w1);
-    And(a=w1, b=notZ, out=term1);
-
-    And(a=notQ1, b=out[0], out=w2);
-    And(a=w2, b=Z, out=term2);
-
-    And(a=out[1], b=out[0], out=w3);
-    And(a=w3, b=Z, out=term3);
-
-    And(a=notQ1, b=notQ0, out=w4);
-    And(a=w4, b=notZ, out=term4);
-
-    Or(a=term1, b=term2, out=or12);
-    Or(a=term3, b=term4, out=or34);
-    Or(a=or12, b=or34, out=D1);
+    DFF(in=d0, out=q0);
+    DFF(in=d1, out=q1);
+    
+    Or(a=q0, b=false, out=out[0]);
+    Or(a=q1, b=false, out=out[1]);
+    
+    Not(in=q0, out=not_q0);
+    Xor(a=q1, b=q0, out=xor_q1_q0);
+    Not(in=xor_q1_q0, out=not_xor_q1_q0);
+    
+    Or(a=not_q0, b=not_q0, out=d0);
+    
+    Mux(a=xor_q1_q0, b=not_xor_q1_q0, sel=Z, out=d1);
 }
