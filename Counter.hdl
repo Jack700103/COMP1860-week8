@@ -3,18 +3,31 @@ CHIP Counter {
     OUT out[4];
     
     PARTS:
-    Register(in=next, load=true, out=current);
-    
-    Inc16(in=current, out=incremented);
-    
-    Mux16(a=current, b=incremented, sel=inc, out=incSelected);
-    
-    Zero16(out=zero);
-    
-    Mux16(a=incSelected, b=zero, sel=reset, out=next);
-    
-    Or(a=current[0], b=false, out=out[0]);
-    Or(a=current[1], b=false, out=out[1]);
-    Or(a=current[2], b=false, out=out[2]);
-    Or(a=current[3], b=false, out=out[3]);
+    DFF(in=next0, out=current0);
+    DFF(in=next1, out=current1);
+    DFF(in=next2, out=current2);
+    DFF(in=next3, out=current3);
+
+    Or(a=current0, b=false, out=out[0]);
+    Or(a=current1, b=false, out=out[1]);
+    Or(a=current2, b=false, out=out[2]);
+    Or(a=current3, b=false, out=out[3]);
+
+    Not(in=current0, out=inc0);
+    And(a=current0, b=inc, out=carry0);
+    Xor(a=current1, b=carry0, out=inc1);
+    And(a=current1, b=carry0, out=carry1);
+    Xor(a=current2, b=carry1, out=inc2);
+    And(a=current2, b=carry1, out=carry2);
+    Xor(a=current3, b=carry2, out=inc3);
+
+    Mux(a=current0, b=inc0, sel=inc, out=incOrCurrent0);
+    Mux(a=current1, b=inc1, sel=inc, out=incOrCurrent1);
+    Mux(a=current2, b=inc2, sel=inc, out=incOrCurrent2);
+    Mux(a=current3, b=inc3, sel=inc, out=incOrCurrent3);
+
+    Mux(a=incOrCurrent0, b=false, sel=reset, out=next0);
+    Mux(a=incOrCurrent1, b=false, sel=reset, out=next1);
+    Mux(a=incOrCurrent2, b=false, sel=reset, out=next2);
+    Mux(a=incOrCurrent3, b=false, sel=reset, out=next3);
 }

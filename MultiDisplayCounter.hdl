@@ -3,45 +3,58 @@ CHIP MultiDisplayCounter {
     OUT DigitA[7], DigitB[7];
     
     PARTS:
+    CounterDec(dec=dec, reset=false, out=lowCount);
+
+    Or(a=lowCount[0], b=lowCount[1], out=orLow01);
+    Or(a=orLow01, b=lowCount[2], out=orLow012);
+    Or(a=orLow012, b=lowCount[3], out=lowNonZero);
+    Not(in=lowNonZero, out=lowZero);
+    And(a=dec, b=lowZero, out=highDec);
+
     DFF(in=next0, out=current0);
     DFF(in=next1, out=current1);
     DFF(in=next2, out=current2);
     DFF(in=next3, out=current3);
+
     DFF(in=next4, out=current4);
     DFF(in=next5, out=current5);
     DFF(in=next6, out=current6);
     DFF(in=next7, out=current7);
-    
+
     Not(in=current0, out=dec0);
-    Or(a=current0, b=false, out=borrow0);
-    
-    Not(in=borrow0, out=not_borrow0);
-    Xor(a=current1, b=not_borrow0, out=dec1);
-    Or(a=current1, b=borrow0, out=borrow1);
-    
-    Not(in=borrow1, out=not_borrow1);
-    Xor(a=current2, b=not_borrow1, out=dec2);
-    Or(a=current2, b=borrow1, out=borrow2);
-    
-    Not(in=borrow2, out=not_borrow2);
-    Xor(a=current3, b=not_borrow2, out=dec3);
-    Or(a=current3, b=borrow2, out=borrow3);
-    
-    Not(in=borrow3, out=not_borrow3);
-    Xor(a=current4, b=not_borrow3, out=dec4);
-    Or(a=current4, b=borrow3, out=borrow4);
-    
-    Not(in=borrow4, out=not_borrow4);
-    Xor(a=current5, b=not_borrow4, out=dec5);
-    Or(a=current5, b=borrow4, out=borrow5);
-    
-    Not(in=borrow5, out=not_borrow5);
-    Xor(a=current6, b=not_borrow5, out=dec6);
-    Or(a=current6, b=borrow5, out=borrow6);
-    
-    Not(in=borrow6, out=not_borrow6);
-    Xor(a=current7, b=not_borrow6, out=dec7);
-    
+    Not(in=current0, out=borrow0);
+    Xor(a=current1, b=borrow0, out=dec1);
+
+    Not(in=current1, out=not1);
+    And(a=not1, b=borrow0, out=borrow1_temp);
+    Or(a=borrow0, b=borrow1_temp, out=borrow1);
+
+    Xor(a=current2, b=borrow1, out=dec2);
+    Not(in=current2, out=not2);
+    And(a=not2, b=borrow1, out=borrow2_temp);
+    Or(a=borrow1, b=borrow2_temp, out=borrow2);
+
+    Xor(a=current3, b=borrow2, out=dec3);
+    Not(in=current3, out=not3);
+    And(a=not3, b=borrow2, out=borrow3_temp);
+    Or(a=borrow2, b=borrow3_temp, out=borrow3);
+
+    Xor(a=current4, b=borrow3, out=dec4);
+    Not(in=current4, out=not4);
+    And(a=not4, b=borrow3, out=borrow4_temp);
+    Or(a=borrow3, b=borrow4_temp, out=borrow4);
+
+    Xor(a=current5, b=borrow4, out=dec5);
+    Not(in=current5, out=not5);
+    And(a=not5, b=borrow4, out=borrow5_temp);
+    Or(a=borrow4, b=borrow5_temp, out=borrow5);
+
+    Xor(a=current6, b=borrow5, out=dec6);
+    Not(in=current6, out=not6);
+    And(a=not6, b=borrow5, out=borrow6_temp);
+    Or(a=borrow5, b=borrow6_temp, out=borrow6);
+    Xor(a=current7, b=borrow6, out=dec7);
+
     Mux(a=current0, b=dec0, sel=dec, out=decOrCurrent0);
     Mux(a=current1, b=dec1, sel=dec, out=decOrCurrent1);
     Mux(a=current2, b=dec2, sel=dec, out=decOrCurrent2);
@@ -50,7 +63,7 @@ CHIP MultiDisplayCounter {
     Mux(a=current5, b=dec5, sel=dec, out=decOrCurrent5);
     Mux(a=current6, b=dec6, sel=dec, out=decOrCurrent6);
     Mux(a=current7, b=dec7, sel=dec, out=decOrCurrent7);
-    
+
     Mux(a=decOrCurrent0, b=true, sel=reset, out=next0);
     Mux(a=decOrCurrent1, b=true, sel=reset, out=next1);
     Mux(a=decOrCurrent2, b=true, sel=reset, out=next2);
@@ -59,12 +72,22 @@ CHIP MultiDisplayCounter {
     Mux(a=decOrCurrent5, b=true, sel=reset, out=next5);
     Mux(a=decOrCurrent6, b=true, sel=reset, out=next6);
     Mux(a=decOrCurrent7, b=true, sel=reset, out=next7);
-    
-    Decoder(in[0]=current0, in[1]=current1, in[2]=current2, in[3]=current3,
-            a=DigitB[0], b=DigitB[1], c=DigitB[2], d=DigitB[3], 
+
+    Or(a=current0, b=false, out=low0);
+    Or(a=current1, b=false, out=low1);
+    Or(a=current2, b=false, out=low2);
+    Or(a=current3, b=false, out=low3);
+
+    Or(a=current4, b=false, out=high0);
+    Or(a=current5, b=false, out=high1);
+    Or(a=current6, b=false, out=high2);
+    Or(a=current7, b=false, out=high3);
+
+    Decoder(in[0]=low0, in[1]=low1, in[2]=low2, in[3]=low3,
+            a=DigitB[0], b=DigitB[1], c=DigitB[2], d=DigitB[3],
             e=DigitB[4], f=DigitB[5], g=DigitB[6]);
-    
-    Decoder(in[0]=current4, in[1]=current5, in[2]=current6, in[3]=current7,
-            a=DigitA[0], b=DigitA[1], c=DigitA[2], d=DigitA[3], 
+
+    Decoder(in[0]=high0, in[1]=high1, in[2]=high2, in[3]=high3,
+            a=DigitA[0], b=DigitA[1], c=DigitA[2], d=DigitA[3],
             e=DigitA[4], f=DigitA[5], g=DigitA[6]);
 }

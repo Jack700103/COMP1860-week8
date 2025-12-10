@@ -7,33 +7,39 @@ CHIP CounterDec {
     DFF(in=next1, out=current1);
     DFF(in=next2, out=current2);
     DFF(in=next3, out=current3);
-    
+
     Or(a=current0, b=false, out=out[0]);
     Or(a=current1, b=false, out=out[1]);
     Or(a=current2, b=false, out=out[2]);
     Or(a=current3, b=false, out=out[3]);
+
+    Not(in=current0, out=dec0);
+    Or(a=current0, b=true, out=borrow0);
+    Xor(a=current1, b=borrow0, out=dec1_temp);
+    And(a=current1, b=borrow0, out=borrow1);
+
+    Not(in=current0, out=not0);
+    Or(a=current0, b=false, out=borrow0_real);
+    Not(in=current0, out=dec0_real);
+    Not(in=current0, out=borrow0_out);
     
-    Not(in=current0, out=dec0);                 
-    Or(a=current0, b=false, out=c0);            
+    Xor(a=current1, b=borrow0_out, out=dec1_real);
+    And(a=not0, b=current1, out=borrow1_temp);
+    Or(a=borrow0_out, b=borrow1_temp, out=borrow1_out);
     
-    Not(in=c0, out=not_c0);
-    Xor(a=current1, b=not_c0, out=dec1);        
-    Or(a=current1, b=c0, out=c1);               
+    Xor(a=current2, b=borrow1_out, out=dec2_real);
+    And(a=not1, b=current2, out=borrow2_temp);
+    Or(a=borrow1_out, b=borrow2_temp, out=borrow2_out);
     
-    Not(in=c1, out=not_c1);
-    Xor(a=current2, b=not_c1, out=dec2);        
-    Or(a=current2, b=c1, out=c2);               
-    
-    Not(in=c2, out=not_c2);
-    Xor(a=current3, b=not_c2, out=dec3);        
-    
-    Mux(a=current0, b=dec0, sel=dec, out=decOrCurrent0);
-    Mux(a=current1, b=dec1, sel=dec, out=decOrCurrent1);
-    Mux(a=current2, b=dec2, sel=dec, out=decOrCurrent2);
-    Mux(a=current3, b=dec3, sel=dec, out=decOrCurrent3);
-    
-    Mux(a=decOrCurrent0, b=true, sel=reset, out=next0);   
-    Mux(a=decOrCurrent1, b=false, sel=reset, out=next1);   
-    Mux(a=decOrCurrent2, b=false, sel=reset, out=next2);   
-    Mux(a=decOrCurrent3, b=true, sel=reset, out=next3);   
+    Xor(a=current3, b=borrow2_out, out=dec3_real);
+
+    Mux(a=current0, b=dec0_real, sel=dec, out=decOrCurrent0);
+    Mux(a=current1, b=dec1_real, sel=dec, out=decOrCurrent1);
+    Mux(a=current2, b=dec2_real, sel=dec, out=decOrCurrent2);
+    Mux(a=current3, b=dec3_real, sel=dec, out=decOrCurrent3);
+
+    Mux(a=decOrCurrent0, b=true, sel=reset, out=next0);
+    Mux(a=decOrCurrent1, b=false, sel=reset, out=next1);
+    Mux(a=decOrCurrent2, b=false, sel=reset, out=next2);
+    Mux(a=decOrCurrent3, b=true, sel=reset, out=next3);
 }

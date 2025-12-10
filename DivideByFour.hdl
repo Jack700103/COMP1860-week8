@@ -8,12 +8,13 @@ CHIP DivideByFour {
     
     Or(a=q0, b=false, out=out[0]);
     Or(a=q1, b=false, out=out[1]);
-    
+
     Not(in=q0, out=not_q0);
+
     Xor(a=q1, b=q0, out=xor_q1_q0);
-    Not(in=xor_q1_q0, out=not_xor_q1_q0);
-    
-    Or(a=not_q0, b=not_q0, out=d0);
-    
-    Mux(a=xor_q1_q0, b=not_xor_q1_q0, sel=Z, out=d1);
+    Not(in=xor_q1_q0, out=xnor_q1_q0);
+
+    Mux(a=xor_q1_q0, b=xnor_q1_q0, sel=Z, out=d1);
+
+    Or(a=not_q0, b=false, out=d0);
 }
