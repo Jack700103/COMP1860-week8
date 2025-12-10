@@ -15,28 +15,28 @@ CHIP CounterDec {
 
     Not(in=current0, out=dec0);
     Or(a=current0, b=true, out=borrow0);
-    Xor(a=current1, b=borrow0, out=dec1_temp);
+    Xor(a=current1, b=borrow0, out=dec1temp);
     And(a=current1, b=borrow0, out=borrow1);
 
     Not(in=current0, out=not0);
-    Or(a=current0, b=false, out=borrow0_real);
-    Not(in=current0, out=dec0_real);
-    Not(in=current0, out=borrow0_out);
+    Or(a=current0, b=false, out=borrow0real);
+    Not(in=current0, out=dec0real);
+    Not(in=current0, out=borrow0out);
     
-    Xor(a=current1, b=borrow0_out, out=dec1_real);
-    And(a=not0, b=current1, out=borrow1_temp);
-    Or(a=borrow0_out, b=borrow1_temp, out=borrow1_out);
+    Xor(a=current1, b=borrow0out, out=dec1real);
+    And(a=not0, b=current1, out=borrow1temp);
+    Or(a=borrow0out, b=borrow1temp, out=borrow1out);
     
-    Xor(a=current2, b=borrow1_out, out=dec2_real);
-    And(a=not1, b=current2, out=borrow2_temp);
-    Or(a=borrow1_out, b=borrow2_temp, out=borrow2_out);
+    Xor(a=current2, b=borrow1out, out=dec2real);
+    And(a=not1, b=current2, out=borrow2temp);
+    Or(a=borrow1out, b=borrow2temp, out=borrow2out);
     
-    Xor(a=current3, b=borrow2_out, out=dec3_real);
+    Xor(a=current3, b=borrow2out, out=dec3real);
 
-    Mux(a=current0, b=dec0_real, sel=dec, out=decOrCurrent0);
-    Mux(a=current1, b=dec1_real, sel=dec, out=decOrCurrent1);
-    Mux(a=current2, b=dec2_real, sel=dec, out=decOrCurrent2);
-    Mux(a=current3, b=dec3_real, sel=dec, out=decOrCurrent3);
+    Mux(a=current0, b=dec0real, sel=dec, out=decOrCurrent0);
+    Mux(a=current1, b=dec1real, sel=dec, out=decOrCurrent1);
+    Mux(a=current2, b=dec2real, sel=dec, out=decOrCurrent2);
+    Mux(a=current3, b=dec3real, sel=dec, out=decOrCurrent3);
 
     Mux(a=decOrCurrent0, b=true, sel=reset, out=next0);
     Mux(a=decOrCurrent1, b=false, sel=reset, out=next1);
