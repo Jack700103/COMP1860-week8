@@ -13,30 +13,28 @@ CHIP CounterDec {
     Or(a=current2, b=false, out=out[2]);
     Or(a=current3, b=false, out=out[3]);
 
-    Not(in=current0, out=dec0);
-    Or(a=current0, b=true, out=borrow0);
-    Xor(a=current1, b=borrow0, out=dec1temp);
-    And(a=current1, b=borrow0, out=borrow1);
+    Xor(a=current0, b=true, out=sum0);
+    And(a=current0, b=true, out=carry0);
 
-    Not(in=current0, out=not0);
-    Or(a=current0, b=false, out=borrow0real);
-    Not(in=current0, out=dec0real);
-    Not(in=current0, out=borrow0out);
-    
-    Xor(a=current1, b=borrow0out, out=dec1real);
-    And(a=not0, b=current1, out=borrow1temp);
-    Or(a=borrow0out, b=borrow1temp, out=borrow1out);
-    
-    Xor(a=current2, b=borrow1out, out=dec2real);
-    And(a=not1, b=current2, out=borrow2temp);
-    Or(a=borrow1out, b=borrow2temp, out=borrow2out);
-    
-    Xor(a=current3, b=borrow2out, out=dec3real);
+    Xor(a=current1, b=true, out=sum1_without_carry);
+    Xor(a=sum1_without_carry, b=carry0, out=sum1);
+    And(a=current1, b=true, out=and1);
+    And(a=sum1_without_carry, b=carry0, out=and2);
+    Or(a=and1, b=and2, out=carry1);
 
-    Mux(a=current0, b=dec0real, sel=dec, out=decOrCurrent0);
-    Mux(a=current1, b=dec1real, sel=dec, out=decOrCurrent1);
-    Mux(a=current2, b=dec2real, sel=dec, out=decOrCurrent2);
-    Mux(a=current3, b=dec3real, sel=dec, out=decOrCurrent3);
+    Xor(a=current2, b=true, out=sum2_without_carry);
+    Xor(a=sum2_without_carry, b=carry1, out=sum2);
+    And(a=current2, b=true, out=and3);
+    And(a=sum2_without_carry, b=carry1, out=and4);
+    Or(a=and3, b=and4, out=carry2);
+
+    Xor(a=current3, b=true, out=sum3_without_carry);
+    Xor(a=sum3_without_carry, b=carry2, out=sum3);
+
+    Mux(a=current0, b=sum0, sel=dec, out=decOrCurrent0);
+    Mux(a=current1, b=sum1, sel=dec, out=decOrCurrent1);
+    Mux(a=current2, b=sum2, sel=dec, out=decOrCurrent2);
+    Mux(a=current3, b=sum3, sel=dec, out=decOrCurrent3);
 
     Mux(a=decOrCurrent0, b=true, sel=reset, out=next0);
     Mux(a=decOrCurrent1, b=false, sel=reset, out=next1);
