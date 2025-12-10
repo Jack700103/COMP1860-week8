@@ -16,20 +16,20 @@ CHIP CounterDec {
     Xor(a=current0, b=true, out=sum0);
     And(a=current0, b=true, out=carry0);
 
-    Xor(a=current1, b=true, out=sum1_without_carry);
-    Xor(a=sum1_without_carry, b=carry0, out=sum1);
+    Xor(a=current1, b=true, out=sum1withoutcarry);
+    Xor(a=sum1withoutcarry, b=carry0, out=sum1);
     And(a=current1, b=true, out=and1);
-    And(a=sum1_without_carry, b=carry0, out=and2);
+    And(a=sum1withoutcarry, b=carry0, out=and2);
     Or(a=and1, b=and2, out=carry1);
 
-    Xor(a=current2, b=true, out=sum2_without_carry);
-    Xor(a=sum2_without_carry, b=carry1, out=sum2);
+    Xor(a=current2, b=true, out=sum2withoutcarry);
+    Xor(a=sum2withoutcarry, b=carry1, out=sum2);
     And(a=current2, b=true, out=and3);
-    And(a=sum2_without_carry, b=carry1, out=and4);
+    And(a=sum2withoutcarry, b=carry1, out=and4);
     Or(a=and3, b=and4, out=carry2);
 
-    Xor(a=current3, b=true, out=sum3_without_carry);
-    Xor(a=sum3_without_carry, b=carry2, out=sum3);
+    Xor(a=current3, b=true, out=sum3withoutcarry);
+    Xor(a=sum3withoutcarry, b=carry2, out=sum3);
 
     Mux(a=current0, b=sum0, sel=dec, out=decOrCurrent0);
     Mux(a=current1, b=sum1, sel=dec, out=decOrCurrent1);
